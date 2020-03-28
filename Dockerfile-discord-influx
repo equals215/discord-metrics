@@ -1,0 +1,17 @@
+FROM rust:latest as builder
+WORKDIR /app
+COPY discord-influx /app/discord-influx
+RUN set -xe; \
+    cd discord-influx && \
+    cargo build --release
+
+FROM debian:buster as app
+COPY --from=builder /app/discord-influx/target/release/discord-influx /discord-influx
+RUN set -xe; \
+    apt update && \
+    apt install -y libssl-dev ca-certificates curl
+COPY utils/discord-influx-run.sh /run.sh
+RUN chmod +x /run.sh
+WORKDIR /
+CMD [ "bash", "/run.sh" ]
+

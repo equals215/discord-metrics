@@ -1,0 +1,4 @@
+[submodule "discord-influx"]
+	path = discord-influx
+	url = https://github.com/terorie/discord-influx.git
+	branch = dev

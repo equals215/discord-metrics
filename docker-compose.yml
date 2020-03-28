@@ -1,0 +1,49 @@
+version: '3'
+services:
+  influxdb:
+    image: influxdb:latest
+    restart: always
+    container_name: influxdb
+    ports:
+        - 8083:8083
+        - 8086:8086
+        - 8090:8090
+    env_file:
+        - 'env.influxdb'
+    volumes:
+        - influx_data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    container_name: grafana
+    links:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 80:3000
+
+  # telegraf:
+  #   image: telegraf:latest
+  #   restart: always
+  #   container_name: telegraf
+  #   links:
+  #     - influxdb
+  #   volumes:
+  #     - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+
+  discord-importer:
+    image: discord-influx:latest
+    build:
+      dockerfile: Dockerfile-discord-influx
+      context: .
+    restart: always
+    container_name: discord-importer
+    links:
+      - influxdb
+    env_file: env.discord_influx
+
+volumes:
+  grafana_data:
+  influx_data:
